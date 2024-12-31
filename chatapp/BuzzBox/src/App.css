@@ -1,0 +1,60 @@
+
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('https://cdn.dribbble.com/users/1003944/screenshots/15741863/media/e7c05a6423abe7506c5067508cb8a64b.gif?resize=400x0');
+  background-color: #f4f4f9; /* Light background for a modern look */
+}
+
+.user-identification {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.user-identification h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.user-identification label {
+  font-weight: bold;
+  color: #555;
+  display: block;
+  font-family:Arial, Helvetica, sans-serif;
+  margin-bottom: 10px;
+}
+
+.user-identification input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  margin-left: -10px;
+  border: 1px solid #ccc;
+  background-color: #555;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.user-identification button {
+  background-color: #3f90e7;
+  color: white;
+  border: none;
+  padding: 8px 25px;
+  border-radius: 7px;
+  font-size: 16px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  cursor: pointer;
+}
+
+.user-identification button:hover {
+  background-color: #0056b3;
+}
