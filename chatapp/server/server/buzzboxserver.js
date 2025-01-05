@@ -15,45 +15,62 @@ const io = new Server(server, {
     },
 });
 
-const connectedUsers = {};
+// Maps for connected users
+const connectedUsers = {}; // socket.id -> username
+const usernameToSocketId = {}; // username -> socket.id
+
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Broadcast the received chat message to all clients with a timestamp
+    // Chat message event
     socket.on('chat_message', (data) => {
-        const timestamp = new Date().toISOString(); // Generate ISO timestamp
+        const timestamp = new Date().toISOString();
         const messageWithTimestamp = {
             ...data,
-            timestamp, // Attach the timestamp to the message
+            timestamp,
         };
         console.log('Message received from client:', messageWithTimestamp);
-        io.emit('chat_message', messageWithTimestamp); // Broadcast message
+        io.emit('chat_message', messageWithTimestamp);
     });
 
-    // Notify when a user connects
+    // Private messaging event
+    socket.on('private_message', ({ to, message, from }) => {
+        const targetSocketId = usernameToSocketId[to]; // Find recipient's socket.id
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('private_message', { from, message });
+        } else {
+            console.log(`User ${to} not found or not connected.`);
+        }
+    });
+
+    // User connected event
     socket.on('user_connected', (username) => {
-        connectedUsers[socket.id] = username;
-        console.log(`${username} connected`);
-        io.emit('update_user_list',Object.values(connectedUsers));
+        connectedUsers[socket.id] = username; // Map socket.id to username
+        usernameToSocketId[username] = socket.id; // Map username to socket.id
+        console.log(`${username} connected with ID: ${socket.id}`);
+        io.emit('update_user_list', Object.values(connectedUsers)); // Send updated user list
     });
 
-    // Handle "user is typing" events
+    // Typing events
     socket.on('user_typing', (data) => {
         console.log(`${data.username} is typing...`);
-        socket.broadcast.emit('user_typing', data); // Notify other clients
+        socket.broadcast.emit('user_typing', data);
     });
 
-    // Handle "user stopped typing" events
     socket.on('user_stopped_typing', () => {
         console.log('A user stopped typing');
-        socket.broadcast.emit('user_stopped_typing'); // Notify other clients
+        socket.broadcast.emit('user_stopped_typing');
     });
 
-    // Handle disconnection
+    // User disconnected event
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
-        delete connectedUsers[socket.id];
-        io.emit('update_user_list',Object.values(connectedUsers));
+        const username = connectedUsers[socket.id];
+        if (username) {
+            delete connectedUsers[socket.id]; // Remove socket.id -> username
+            delete usernameToSocketId[username]; // Remove username -> socket.id
+        }
+        io.emit('update_user_list', Object.values(connectedUsers)); // Send updated user list
     });
 });
 
